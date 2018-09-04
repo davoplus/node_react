@@ -56,21 +56,34 @@ class App extends Component {
     this.setState({inputDescription: e.target.value}); 
   }
 
+  handleErrors = (response) => {
+    if (response===undefined) {
+      throw Error("Server is shutdown--");
+    }
+    if (!response.ok) {
+      throw Error(response.statusText);
+    }
+    return response;
+}
+
   getBlogs = () => {
     console.log('buscar Blogs! ');
     var url = 'http://localhost:8080/blog';
 
     fetch(url)
+      .then(this.handleErrors)
       .then(  function(response) {
                 if (response.ok){
                   response.json().then( function(body){
                                           this.setState({ blogs: body });
                                         }.bind(this));  
-                } else {
-                  this.setState({ blogs: [] });
                 }
-              }.bind(this) );
- 
+              }.bind(this)
+      )
+      .catch(function(error) {
+        console.log(error);
+        this.setState({ blogs: [] });
+      }.bind(this)); 
   }
 
 
